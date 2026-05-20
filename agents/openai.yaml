@@ -1,0 +1,4 @@
+interface:
+  display_name: "IP Frame Sheet"
+  short_description: "Generate reference-based 24-frame sprite sheets"
+  default_prompt: "Use $ip-frame-sheet to turn this character reference into a 4x6 animation frame sheet for one-second video generation."

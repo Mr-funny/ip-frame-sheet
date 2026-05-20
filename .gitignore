@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Local generated outputs
+output/
+outputs/
+tmp/
+generated/
+cropped_frames/
+one_second_animation.mp4
+one_second_animation.gif
+sprite_sheet.png
+gpt_sprite_sheet.png
