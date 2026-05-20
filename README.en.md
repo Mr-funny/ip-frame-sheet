@@ -1,4 +1,4 @@
-# IP Frame Sheet
+# Image2GIF
 
 [中文](README.md)
 
@@ -56,13 +56,13 @@ If Codex is not installed yet, use the official OpenAI Codex docs as the source 
 Clone this repository into your Codex skills directory:
 
 ```bash
-git clone https://github.com/Mr-funny/ip-frame-sheet.git ~/.codex/skills/ip-frame-sheet
+git clone https://github.com/Mr-funny/image2gif.git ~/.codex/skills/image2gif
 ```
 
 Restart Codex if needed, then invoke the skill as:
 
 ```text
-Use $ip-frame-sheet with this reference image to generate a one-second typing video.
+Use $image2gif with this reference image to generate a one-second typing video.
 ```
 
 ## Requirements
@@ -112,11 +112,11 @@ export OPENAI_API_KEY="sk-..."
 
 python scripts/generate_sprite_api.py \
   --reference /path/to/reference-character.png \
-  --output /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png
+  --output /tmp/image2gif-output/gpt_sprite_sheet.png
 
 python scripts/sprite_to_video.py \
-  --sprite-sheet /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png \
-  --outdir /tmp/ip-frame-sheet-output
+  --sprite-sheet /tmp/image2gif-output/gpt_sprite_sheet.png \
+  --outdir /tmp/image2gif-output
 ```
 
 If a Codex agent uses this skill for a non-Codex/API target environment, it should search or read the current official OpenAI docs first, then write the API request for the user's environment instead of relying on stale parameters from this README.
@@ -128,7 +128,7 @@ If a Codex agent uses this skill for a non-Codex/API target environment, it shou
 Upload or provide a reference character image in Codex, then ask:
 
 ```text
-Use $ip-frame-sheet with this reference image to generate a one-second typing video.
+Use $image2gif with this reference image to generate a one-second typing video.
 ```
 
 Codex should run the complete workflow:
@@ -174,13 +174,13 @@ Generated images are normally saved by Codex under `~/.codex/generated_images/..
 ```bash
 python scripts/sprite_to_video.py \
   --sprite-sheet /path/to/gpt-image-sprite-sheet.png \
-  --outdir /tmp/ip-frame-sheet-output
+  --outdir /tmp/image2gif-output
 ```
 
 Outputs:
 
 ```text
-/tmp/ip-frame-sheet-output/
+/tmp/image2gif-output/
 ├── sprite_sheet.png
 ├── cropped_frames/
 │   ├── frame_000.png
@@ -200,7 +200,7 @@ ffprobe -v error \
   -select_streams v:0 \
   -show_entries stream=nb_frames,r_frame_rate,duration,width,height \
   -of default=nw=1 \
-  /tmp/ip-frame-sheet-output/one_second_animation.mp4
+  /tmp/image2gif-output/one_second_animation.mp4
 ```
 
 Expected for the default flow:

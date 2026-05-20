@@ -1,9 +1,9 @@
 ---
-name: ip-frame-sheet
+name: image2gif
 description: Generate one-second videos from user-provided reference character images through a GPT Image sprite-sheet workflow. Use when the user provides or points to a character/IP/reference image and wants Codex to generate a 4x6/24-frame sprite sheet, crop it into frames, and export MP4/GIF video while preserving the reference character identity and natural motion.
 ---
 
-# IP Frame Sheet
+# Image2GIF
 
 ## Overview
 
@@ -54,7 +54,7 @@ Use the built-in image generation tool first with the user's reference image vis
 ```bash
 python scripts/sprite_to_video.py \
   --sprite-sheet /path/to/gpt-image-sprite-sheet.png \
-  --outdir /tmp/ip-frame-sheet-output
+  --outdir /tmp/image2gif-output
 ```
 
 The script creates:
@@ -71,11 +71,11 @@ For non-Codex API usage after checking current official docs:
 export OPENAI_API_KEY=...
 python scripts/generate_sprite_api.py \
   --reference /path/to/reference.png \
-  --output /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png
+  --output /tmp/image2gif-output/gpt_sprite_sheet.png
 
 python scripts/sprite_to_video.py \
-  --sprite-sheet /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png \
-  --outdir /tmp/ip-frame-sheet-output
+  --sprite-sheet /tmp/image2gif-output/gpt_sprite_sheet.png \
+  --outdir /tmp/image2gif-output
 ```
 
 End-to-end completion means these final files exist:

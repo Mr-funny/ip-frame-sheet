@@ -1,4 +1,4 @@
-# IP Frame Sheet
+# Image2GIF
 
 [English](README.en.md)
 
@@ -56,13 +56,13 @@
 安装 skill：
 
 ```bash
-git clone https://github.com/Mr-funny/ip-frame-sheet.git ~/.codex/skills/ip-frame-sheet
+git clone https://github.com/Mr-funny/image2gif.git ~/.codex/skills/image2gif
 ```
 
 如有需要，重启 Codex，然后这样调用：
 
 ```text
-Use $ip-frame-sheet with this reference image to generate a one-second typing video.
+Use $image2gif with this reference image to generate a one-second typing video.
 ```
 
 ## 环境要求
@@ -112,11 +112,11 @@ export OPENAI_API_KEY="sk-..."
 
 python scripts/generate_sprite_api.py \
   --reference /path/to/reference-character.png \
-  --output /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png
+  --output /tmp/image2gif-output/gpt_sprite_sheet.png
 
 python scripts/sprite_to_video.py \
-  --sprite-sheet /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png \
-  --outdir /tmp/ip-frame-sheet-output
+  --sprite-sheet /tmp/image2gif-output/gpt_sprite_sheet.png \
+  --outdir /tmp/image2gif-output
 ```
 
 如果你是在 Codex 里让 agent 使用这个 skill，但目标环境不是 Codex，agent 应该先联网搜索/读取 OpenAI 官方文档，再帮你生成适配当前 API 的请求代码，而不是依赖 README 中的旧参数。
@@ -128,7 +128,7 @@ python scripts/sprite_to_video.py \
 在 Codex 里上传或提供一张参考角色图，然后直接说：
 
 ```text
-Use $ip-frame-sheet with this reference image to generate a one-second typing video.
+Use $image2gif with this reference image to generate a one-second typing video.
 ```
 
 Codex 应该执行完整流程：
@@ -174,13 +174,13 @@ Codex 生成的图片通常会保存在 `~/.codex/generated_images/...`。选中
 ```bash
 python scripts/sprite_to_video.py \
   --sprite-sheet /path/to/gpt-image-sprite-sheet.png \
-  --outdir /tmp/ip-frame-sheet-output
+  --outdir /tmp/image2gif-output
 ```
 
 输出：
 
 ```text
-/tmp/ip-frame-sheet-output/
+/tmp/image2gif-output/
 ├── sprite_sheet.png
 ├── cropped_frames/
 │   ├── frame_000.png
@@ -200,7 +200,7 @@ ffprobe -v error \
   -select_streams v:0 \
   -show_entries stream=nb_frames,r_frame_rate,duration,width,height \
   -of default=nw=1 \
-  /tmp/ip-frame-sheet-output/one_second_animation.mp4
+  /tmp/image2gif-output/one_second_animation.mp4
 ```
 
 默认期望：

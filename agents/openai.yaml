@@ -1,4 +1,4 @@
 interface:
-  display_name: "IP Frame Sheet"
+  display_name: "Image2GIF"
   short_description: "Generate reference-based 24-frame sprite sheets"
-  default_prompt: "Use $ip-frame-sheet with my reference image to generate a 4x6 sprite sheet, crop it into 24 frames, and export a one-second video."
+  default_prompt: "Use $image2gif with my reference image to generate a 4x6 sprite sheet, crop it into 24 frames, and export a one-second video."
