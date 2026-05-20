@@ -37,7 +37,7 @@ This skill is designed for workflows where GPT Image can generate a strong still
 Clone this repository into your Codex skills directory:
 
 ```bash
-git clone https://github.com/<your-user>/ip-frame-sheet.git ~/.codex/skills/ip-frame-sheet
+git clone https://github.com/Mr-funny/ip-frame-sheet.git ~/.codex/skills/ip-frame-sheet
 ```
 
 Restart Codex if needed, then invoke the skill as:
