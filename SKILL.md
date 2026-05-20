@@ -21,6 +21,7 @@ If the user asks for a video and provides a reference image, do the complete wor
 
 Collect or infer:
 - Reference image path or attachment.
+- Runtime path: Codex built-in image generation, or non-Codex OpenAI API.
 - Subject description, especially identity markers that must remain stable.
 - Action to animate, such as typing, walking, turning, attacking, waving, blinking, or breathing.
 - Sheet layout, defaulting to `4x6`.
@@ -40,6 +41,12 @@ When the reference is a recognizable third-party IP and the user has not stated 
 
 Natural motion requirement: the generated sprite sheet must not show one rigid pasted character moving from cell to cell. Prompt GPT Image to animate independent parts: body breathing, head or face, eyes/glow, hair/flame/cloth effects, arms/hands, props, tail/wing/secondary appendages, and contact motion with the environment.
 
+## Runtime Selection
+
+Prefer Codex built-in image generation when available. It does not require `OPENAI_API_KEY` and should be the default path inside Codex.
+
+When the user is not running in Codex or explicitly wants API code, first search current official OpenAI documentation for image generation/editing before writing the request. Use the `openai-docs` skill or web search restricted to official OpenAI domains. Then generate or update the API request for the user's environment. Current API fallback script: `scripts/generate_sprite_api.py`.
+
 ## Generate A Video
 
 Use the built-in image generation tool first with the user's reference image visible in the conversation. The prompt must reference the input character image and ask for a single 4x6 sprite sheet. After the generated sprite sheet is saved locally, run `scripts/sprite_to_video.py`:
@@ -57,6 +64,19 @@ The script creates:
 - `one_second_animation.mp4`
 
 `scripts/sprite_to_video.py` does not draw or invent frames. It only crops the GPT Image generated sprite sheet and encodes the cropped cells into video. `scripts/make_one_second_video.py` is a procedural preview fallback only; do not use it as the main workflow when image generation is available.
+
+For non-Codex API usage after checking current official docs:
+
+```bash
+export OPENAI_API_KEY=...
+python scripts/generate_sprite_api.py \
+  --reference /path/to/reference.png \
+  --output /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png
+
+python scripts/sprite_to_video.py \
+  --sprite-sheet /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png \
+  --outdir /tmp/ip-frame-sheet-output
+```
 
 End-to-end completion means these final files exist:
 - the GPT Image generated `sprite_sheet.png`

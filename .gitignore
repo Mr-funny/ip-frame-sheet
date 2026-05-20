@@ -12,6 +12,7 @@ output/
 outputs/
 tmp/
 generated/
+api-output/
 cropped_frames/
 one_second_animation.mp4
 one_second_animation.gif

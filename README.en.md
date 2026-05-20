@@ -31,11 +31,27 @@ This skill is designed for workflows where GPT Image can generate a strong still
 ├── references/workflow.md           # Detailed workflow and QA notes
 └── scripts/
     ├── build_prompt.py              # Prompt builder for 4x6 sprite sheets
+    ├── generate_sprite_api.py       # Non-Codex mode: call OpenAI Images API
     ├── sprite_to_video.py           # Main crop-and-encode script
     └── make_one_second_video.py     # Procedural preview fallback only
 ```
 
 ## Install
+
+### Recommended Path: Install In Codex
+
+This project is primarily a Codex skill. The smoothest path is to install and use it inside Codex because Codex can call built-in GPT Image generation directly. In that path, users do not need to write Images API requests or configure `OPENAI_API_KEY`.
+
+Before installing this skill, you need:
+
+- Codex CLI / Codex desktop installed.
+- Codex running with built-in image generation enabled.
+- Python 3.10+ and ffmpeg locally for cropping the sprite sheet and encoding video.
+
+If Codex is not installed yet, use the official OpenAI Codex docs as the source of truth because installation details can change:
+
+- Codex docs: [https://developers.openai.com/codex](https://developers.openai.com/codex)
+- Codex CLI repository: [https://github.com/openai/codex](https://github.com/openai/codex)
 
 Clone this repository into your Codex skills directory:
 
@@ -55,11 +71,13 @@ For the main Codex workflow:
 
 - Codex with built-in image generation enabled.
 - No `OPENAI_API_KEY` is required when using Codex's built-in image generation tool.
+- The user only provides the reference image; Codex should generate the sprite sheet, crop it, encode video, and verify the output.
 
 For local crop/video assembly:
 
 - Python 3.10+
 - Pillow
+- OpenAI Python SDK (only required for non-Codex API mode)
 - ffmpeg
 
 Install Python dependency:
@@ -73,6 +91,35 @@ Install ffmpeg with Homebrew on macOS:
 ```bash
 brew install ffmpeg
 ```
+
+### Non-Codex / API Mode
+
+If you are not using Codex, or your environment does not expose built-in image generation, use the OpenAI Images API to generate the sprite sheet:
+
+- Requires `OPENAI_API_KEY`.
+- Requires `openai` and `Pillow` from `requirements.txt`.
+- Before using or modifying the API call, check the current official OpenAI image generation/editing docs for the latest model name, parameters, and request shape.
+
+Official docs:
+
+- Image generation guide: [https://platform.openai.com/docs/guides/images](https://platform.openai.com/docs/guides/images)
+- Images API reference: [https://platform.openai.com/docs/api-reference/images](https://platform.openai.com/docs/api-reference/images)
+
+Non-Codex API example:
+
+```bash
+export OPENAI_API_KEY="sk-..."
+
+python scripts/generate_sprite_api.py \
+  --reference /path/to/reference-character.png \
+  --output /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png
+
+python scripts/sprite_to_video.py \
+  --sprite-sheet /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png \
+  --outdir /tmp/ip-frame-sheet-output
+```
+
+If a Codex agent uses this skill for a non-Codex/API target environment, it should search or read the current official OpenAI docs first, then write the API request for the user's environment instead of relying on stale parameters from this README.
 
 ## Usage
 
@@ -94,6 +141,8 @@ Codex should run the complete workflow:
 5. Export one_second_animation.mp4 and one_second_animation.gif.
 6. Verify with ffprobe that the video is 24 fps, 24 frames, and about 1 second.
 ```
+
+The user does not need to provide a sprite sheet. GPT Image should generate the sprite sheet from the user's reference image.
 
 ### 1. Generate The Sprite Sheet With GPT Image
 

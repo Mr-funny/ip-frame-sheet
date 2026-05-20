@@ -31,13 +31,29 @@
 ├── references/workflow.md           # 详细流程和质检规则
 └── scripts/
     ├── build_prompt.py              # 4x6 雪碧图提示词生成器
+    ├── generate_sprite_api.py       # 非 Codex 模式：调用 OpenAI Images API 生成雪碧图
     ├── sprite_to_video.py           # 主流程：裁剪雪碧图并合成视频
     └── make_one_second_video.py     # 程序化预览 fallback，非主流程
 ```
 
 ## 安装
 
-克隆到 Codex skills 目录：
+### 推荐路径：安装到 Codex
+
+这个项目首先是一个 Codex skill。最丝滑的使用方式是在 Codex 里安装并使用，因为 Codex 环境可以直接调用内置 GPT Image 生图能力，不需要用户自己写图像 API 请求，也不需要配置 `OPENAI_API_KEY`。
+
+安装前需要：
+
+- 已安装 Codex CLI / Codex 桌面端。
+- Codex 能正常运行，并且当前环境启用了内置图像生成能力。
+- 本地有 Python 3.10+ 和 ffmpeg，用于裁剪雪碧图并合成视频。
+
+如果还没有 Codex，请先按 OpenAI 官方 Codex 文档安装。由于 Codex 安装方式可能更新，建议以官方文档为准：
+
+- Codex 文档：[https://developers.openai.com/codex](https://developers.openai.com/codex)
+- Codex CLI 仓库：[https://github.com/openai/codex](https://github.com/openai/codex)
+
+安装 skill：
 
 ```bash
 git clone https://github.com/Mr-funny/ip-frame-sheet.git ~/.codex/skills/ip-frame-sheet
@@ -55,11 +71,13 @@ Codex 主流程：
 
 - Codex 已启用内置图像生成能力。
 - 使用 Codex 内置图像生成时，不需要 `OPENAI_API_KEY`。
+- 用户只需要提供参考图，Codex 应该负责生成雪碧图、裁剪、合成视频和验证输出。
 
 本地裁剪和视频合成：
 
 - Python 3.10+
 - Pillow
+- OpenAI Python SDK（仅非 Codex API 模式需要）
 - ffmpeg
 
 安装 Python 依赖：
@@ -73,6 +91,35 @@ macOS 可用 Homebrew 安装 ffmpeg：
 ```bash
 brew install ffmpeg
 ```
+
+### 非 Codex / API 模式
+
+如果不在 Codex 里使用，或者你的环境没有内置图像生成能力，就需要使用 OpenAI Images API 来生成雪碧图：
+
+- 需要 `OPENAI_API_KEY`。
+- 需要安装 `requirements.txt` 里的 `openai` 和 `Pillow`。
+- 使用前应联网查看 OpenAI 官方图像生成/编辑 API 文档，确认当前模型名、参数和请求格式。
+
+官方文档入口：
+
+- 图像生成指南：[https://platform.openai.com/docs/guides/images](https://platform.openai.com/docs/guides/images)
+- Images API 参考：[https://platform.openai.com/docs/api-reference/images](https://platform.openai.com/docs/api-reference/images)
+
+非 Codex API 示例：
+
+```bash
+export OPENAI_API_KEY="sk-..."
+
+python scripts/generate_sprite_api.py \
+  --reference /path/to/reference-character.png \
+  --output /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png
+
+python scripts/sprite_to_video.py \
+  --sprite-sheet /tmp/ip-frame-sheet-output/gpt_sprite_sheet.png \
+  --outdir /tmp/ip-frame-sheet-output
+```
+
+如果你是在 Codex 里让 agent 使用这个 skill，但目标环境不是 Codex，agent 应该先联网搜索/读取 OpenAI 官方文档，再帮你生成适配当前 API 的请求代码，而不是依赖 README 中的旧参数。
 
 ## 使用方法
 
@@ -94,6 +141,8 @@ Codex 应该执行完整流程：
 5. 输出 one_second_animation.mp4 和 one_second_animation.gif
 6. 用 ffprobe 验证视频是 24 fps、24 帧、约 1 秒
 ```
+
+用户不需要自己准备雪碧图。雪碧图应该由 GPT Image 根据用户输入的参考图生成。
 
 ### 1. 用 GPT Image 生成雪碧图
 
