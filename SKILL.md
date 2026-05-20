@@ -1,13 +1,13 @@
 ---
 name: ip-frame-sheet
-description: Generate reference-character animation frame sheets for image-to-video workflows. Use when the user wants to turn a character/IP/reference image into a single 4x6 or similar sprite sheet, sequential animation frames, GIF/video source frames, or prompts for one-second video generation while preserving the reference character's identity and making motion changes smooth.
+description: Generate one-second videos from user-provided reference character images through a GPT Image sprite-sheet workflow. Use when the user provides or points to a character/IP/reference image and wants Codex to generate a 4x6/24-frame sprite sheet, crop it into frames, and export MP4/GIF video while preserving the reference character identity and natural motion.
 ---
 
 # IP Frame Sheet
 
 ## Overview
 
-Convert a reference character image into a GPT-Image sprite-sheet-first workflow: use the built-in image generation tool to generate one combined 4x6/24-frame sprite sheet from the reference image, then crop that sprite sheet into ordered frames, then assemble the cropped frames into a 1-second video.
+Convert the user's reference character image into a video. The required end-to-end workflow is: user input reference image -> built-in GPT Image generates one combined 4x6/24-frame sprite sheet -> crop that sprite sheet into ordered frames -> assemble the cropped frames into a 1-second MP4/GIF.
 
 Use this skill to produce either:
 - A generation prompt for an image model.
@@ -15,7 +15,7 @@ Use this skill to produce either:
 - A GPT Image generated sprite sheet, cropped frame sequence, and 1-second MP4/GIF when a reference image is available.
 - QA guidance for checking whether the resulting sheet can become a GIF or short video.
 
-If the user asks to generate the actual bitmap frame sheet, also use the image generation capability available in the environment. If the user asks only for the reusable prompt or workflow, do not generate images.
+If the user asks for a video and provides a reference image, do the complete workflow. Do not stop at a prompt or at the sprite sheet unless the user explicitly asks for only that intermediate artifact.
 
 ## Inputs
 
@@ -42,7 +42,7 @@ Natural motion requirement: the generated sprite sheet must not show one rigid p
 
 ## Generate A Video
 
-Use the built-in image generation tool first. The prompt must reference the input character image and ask for a single 4x6 sprite sheet. After the generated sprite sheet is saved locally, run `scripts/sprite_to_video.py`:
+Use the built-in image generation tool first with the user's reference image visible in the conversation. The prompt must reference the input character image and ask for a single 4x6 sprite sheet. After the generated sprite sheet is saved locally, run `scripts/sprite_to_video.py`:
 
 ```bash
 python scripts/sprite_to_video.py \
@@ -57,6 +57,12 @@ The script creates:
 - `one_second_animation.mp4`
 
 `scripts/sprite_to_video.py` does not draw or invent frames. It only crops the GPT Image generated sprite sheet and encodes the cropped cells into video. `scripts/make_one_second_video.py` is a procedural preview fallback only; do not use it as the main workflow when image generation is available.
+
+End-to-end completion means these final files exist:
+- the GPT Image generated `sprite_sheet.png`
+- 24 cropped files in `cropped_frames/`
+- `one_second_animation.mp4`
+- `one_second_animation.gif`
 
 ## Prompt Builder
 

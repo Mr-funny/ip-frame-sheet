@@ -2,18 +2,19 @@
 
 [中文](README.md)
 
-Codex skill for turning a reference character image into a one-second animation through a sprite-sheet-first workflow.
+Codex skill for turning a user-provided reference character image into a one-second animation through a sprite-sheet-first workflow.
 
 The intended pipeline is:
 
 ```text
-reference image -> GPT Image generated 4x6 sprite sheet -> crop 24 frames -> encode 1-second MP4/GIF
+user input reference image -> GPT Image generated 4x6 sprite sheet -> crop 24 frames -> encode 1-second MP4/GIF
 ```
 
 This skill is designed for workflows where GPT Image can generate a strong still image but the final deliverable needs a short video-like animation. It keeps the image model responsible for generating the sprite sheet and uses local deterministic tooling only for cropping and video assembly.
 
 ## What This Skill Does
 
+- Takes a user-provided reference character image through the full reference-to-video workflow.
 - Builds prompts for a reference-preserving 4x6 animation sprite sheet.
 - Uses Codex's built-in image generation flow as the main way to create the sprite sheet.
 - Crops the generated sprite sheet into 24 ordered frames.
@@ -45,7 +46,7 @@ git clone https://github.com/Mr-funny/ip-frame-sheet.git ~/.codex/skills/ip-fram
 Restart Codex if needed, then invoke the skill as:
 
 ```text
-Use $ip-frame-sheet with this reference image to make a one-second typing animation.
+Use $ip-frame-sheet with this reference image to generate a one-second typing video.
 ```
 
 ## Requirements
@@ -75,6 +76,25 @@ brew install ffmpeg
 
 ## Usage
 
+### End-To-End Codex Usage
+
+Upload or provide a reference character image in Codex, then ask:
+
+```text
+Use $ip-frame-sheet with this reference image to generate a one-second typing video.
+```
+
+Codex should run the complete workflow:
+
+```text
+1. Inspect the user-provided reference image.
+2. Use built-in GPT Image to generate one 4x6 / 24-frame sprite sheet.
+3. Save the generated sprite sheet into the working directory.
+4. Run scripts/sprite_to_video.py to crop 24 frames.
+5. Export one_second_animation.mp4 and one_second_animation.gif.
+6. Verify with ffprobe that the video is 24 fps, 24 frames, and about 1 second.
+```
+
 ### 1. Generate The Sprite Sheet With GPT Image
 
 Use the reference image as the character identity source and ask GPT Image for one combined sprite sheet, not separate images.
@@ -98,7 +118,7 @@ Consistent camera angle, consistent lighting, consistent scale, white or light b
 clear gutters between cells, crop-ready square cells.
 ```
 
-Generated images are normally saved by Codex under `~/.codex/generated_images/...`. Copy the selected sprite sheet into your working directory.
+Generated images are normally saved by Codex under `~/.codex/generated_images/...`. Copy the selected sprite sheet into your working directory. This sprite sheet is the only input for the crop and video assembly stage.
 
 ### 2. Crop And Encode
 

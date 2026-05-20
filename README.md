@@ -2,18 +2,19 @@
 
 [English](README.en.md)
 
-一个 Codex skill：把参考角色图变成一秒动画，核心流程是先用 GPT Image 生成 4x6 雪碧图，再裁剪 24 帧，最后合成 MP4/GIF。
+一个 Codex skill：用户输入一张参考角色图，Codex 先用 GPT Image 生成 4x6 雪碧图，再裁剪 24 帧，最后合成 1 秒 MP4/GIF 视频。
 
 目标管线：
 
 ```text
-参考图 -> GPT Image 生成 4x6 雪碧图 -> 裁剪 24 帧 -> 编码 1 秒 MP4/GIF
+用户输入参考图 -> GPT Image 生成 4x6 雪碧图 -> 裁剪 24 帧 -> 编码 1 秒 MP4/GIF
 ```
 
 这个 skill 适合“图像模型能生成高质量静态图，但最终想要一段短视频/动图”的场景。GPT Image 负责根据参考图生成完整雪碧图；本地脚本只做确定性的裁剪和视频合成。
 
 ## 功能
 
+- 接收用户提供的参考角色图，完成从参考图到视频的端到端流程。
 - 为“参考图保真”的 4x6 动画雪碧图生成提示词。
 - 使用 Codex 内置图像生成能力作为主流程，不需要 `OPENAI_API_KEY`。
 - 将生成好的雪碧图裁剪成 24 张有序帧。
@@ -45,7 +46,7 @@ git clone https://github.com/Mr-funny/ip-frame-sheet.git ~/.codex/skills/ip-fram
 如有需要，重启 Codex，然后这样调用：
 
 ```text
-Use $ip-frame-sheet with this reference image to make a one-second typing animation.
+Use $ip-frame-sheet with this reference image to generate a one-second typing video.
 ```
 
 ## 环境要求
@@ -75,6 +76,25 @@ brew install ffmpeg
 
 ## 使用方法
 
+### Codex 端到端用法
+
+在 Codex 里上传或提供一张参考角色图，然后直接说：
+
+```text
+Use $ip-frame-sheet with this reference image to generate a one-second typing video.
+```
+
+Codex 应该执行完整流程：
+
+```text
+1. 读取用户输入的参考图
+2. 用内置 GPT Image 生成一张 4x6 / 24 帧雪碧图
+3. 把生成的雪碧图保存到工作目录
+4. 运行 scripts/sprite_to_video.py 裁剪 24 张帧
+5. 输出 one_second_animation.mp4 和 one_second_animation.gif
+6. 用 ffprobe 验证视频是 24 fps、24 帧、约 1 秒
+```
+
 ### 1. 用 GPT Image 生成雪碧图
 
 把参考图作为角色身份来源，让 GPT Image 输出一张合并雪碧图，不要先生成 24 张单独图片。
@@ -98,7 +118,7 @@ Consistent camera angle, consistent lighting, consistent scale, white or light b
 clear gutters between cells, crop-ready square cells.
 ```
 
-Codex 生成的图片通常会保存在 `~/.codex/generated_images/...`。选中满意的雪碧图后，把它复制到工作目录。
+Codex 生成的图片通常会保存在 `~/.codex/generated_images/...`。选中满意的雪碧图后，把它复制到工作目录。这个雪碧图是后续裁剪和视频合成的唯一输入。
 
 ### 2. 裁剪并合成视频
 
