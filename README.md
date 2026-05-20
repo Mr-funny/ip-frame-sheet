@@ -1,83 +1,85 @@
 # IP Frame Sheet
 
-Codex skill for turning a reference character image into a one-second animation through a sprite-sheet-first workflow.
+[English](README.en.md)
 
-The intended pipeline is:
+一个 Codex skill：把参考角色图变成一秒动画，核心流程是先用 GPT Image 生成 4x6 雪碧图，再裁剪 24 帧，最后合成 MP4/GIF。
+
+目标管线：
 
 ```text
-reference image -> GPT Image generated 4x6 sprite sheet -> crop 24 frames -> encode 1-second MP4/GIF
+参考图 -> GPT Image 生成 4x6 雪碧图 -> 裁剪 24 帧 -> 编码 1 秒 MP4/GIF
 ```
 
-This skill is designed for workflows where GPT Image can generate a strong still image but the final deliverable needs a short video-like animation. It keeps the image model responsible for generating the sprite sheet and uses local deterministic tooling only for cropping and video assembly.
+这个 skill 适合“图像模型能生成高质量静态图，但最终想要一段短视频/动图”的场景。GPT Image 负责根据参考图生成完整雪碧图；本地脚本只做确定性的裁剪和视频合成。
 
-## What This Skill Does
+## 功能
 
-- Builds prompts for a reference-preserving 4x6 animation sprite sheet.
-- Uses Codex's built-in image generation flow as the main way to create the sprite sheet.
-- Crops the generated sprite sheet into 24 ordered frames.
-- Encodes the cropped frames into a 24 fps, one-second MP4 and GIF.
-- Includes QA guidance for rejecting rigid "sticker motion" outputs.
+- 为“参考图保真”的 4x6 动画雪碧图生成提示词。
+- 使用 Codex 内置图像生成能力作为主流程，不需要 `OPENAI_API_KEY`。
+- 将生成好的雪碧图裁剪成 24 张有序帧。
+- 将裁剪帧编码成 24 fps、1 秒的 MP4 和 GIF。
+- 提供 QA 规则，避免“整张贴纸僵硬移动”的假动画。
 
-## Repository Layout
+## 目录结构
 
 ```text
 .
-├── SKILL.md                         # Codex skill instructions
-├── agents/openai.yaml               # Codex UI metadata
-├── assets/reference-character.png   # Small sample reference asset
-├── references/workflow.md           # Detailed workflow and QA notes
+├── SKILL.md                         # Codex skill 指令
+├── agents/openai.yaml               # Codex UI 元数据
+├── assets/reference-character.png   # 示例参考角色图
+├── references/workflow.md           # 详细流程和质检规则
 └── scripts/
-    ├── build_prompt.py              # Prompt builder for 4x6 sprite sheets
-    ├── sprite_to_video.py           # Main crop-and-encode script
-    └── make_one_second_video.py     # Procedural preview fallback only
+    ├── build_prompt.py              # 4x6 雪碧图提示词生成器
+    ├── sprite_to_video.py           # 主流程：裁剪雪碧图并合成视频
+    └── make_one_second_video.py     # 程序化预览 fallback，非主流程
 ```
 
-## Install
+## 安装
 
-Clone this repository into your Codex skills directory:
+克隆到 Codex skills 目录：
 
 ```bash
 git clone https://github.com/Mr-funny/ip-frame-sheet.git ~/.codex/skills/ip-frame-sheet
 ```
 
-Restart Codex if needed, then invoke the skill as:
+如有需要，重启 Codex，然后这样调用：
 
 ```text
 Use $ip-frame-sheet with this reference image to make a one-second typing animation.
 ```
 
-## Requirements
+## 环境要求
 
-For the main Codex workflow:
+Codex 主流程：
 
-- Codex with built-in image generation enabled.
-- No `OPENAI_API_KEY` is required when using Codex's built-in image generation tool.
+- Codex 已启用内置图像生成能力。
+- 使用 Codex 内置图像生成时，不需要 `OPENAI_API_KEY`。
 
-For local crop/video assembly:
+本地裁剪和视频合成：
 
 - Python 3.10+
 - Pillow
 - ffmpeg
 
-Install Python dependency:
+安装 Python 依赖：
 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
-Install ffmpeg with Homebrew on macOS:
+macOS 可用 Homebrew 安装 ffmpeg：
 
 ```bash
 brew install ffmpeg
 ```
 
-## Usage
+## 使用方法
 
-### 1. Generate The Sprite Sheet With GPT Image
+### 1. 用 GPT Image 生成雪碧图
 
-Use the reference image as the character identity source and ask GPT Image for one combined sprite sheet, not separate images.
+把参考图作为角色身份来源，让 GPT Image 输出一张合并雪碧图，不要先生成 24 张单独图片。
 
-Prompt shape:
+提示词结构：
 
 ```text
 Use the attached reference image as the exact character identity reference.
@@ -96,9 +98,9 @@ Consistent camera angle, consistent lighting, consistent scale, white or light b
 clear gutters between cells, crop-ready square cells.
 ```
 
-Generated images are normally saved by Codex under `~/.codex/generated_images/...`. Copy the selected sprite sheet into your working directory.
+Codex 生成的图片通常会保存在 `~/.codex/generated_images/...`。选中满意的雪碧图后，把它复制到工作目录。
 
-### 2. Crop And Encode
+### 2. 裁剪并合成视频
 
 ```bash
 python scripts/sprite_to_video.py \
@@ -106,7 +108,7 @@ python scripts/sprite_to_video.py \
   --outdir /tmp/ip-frame-sheet-output
 ```
 
-Outputs:
+输出：
 
 ```text
 /tmp/ip-frame-sheet-output/
@@ -120,9 +122,9 @@ Outputs:
 └── metadata.txt
 ```
 
-### 3. Verify
+### 3. 验证
 
-Use `ffprobe`:
+使用 `ffprobe`：
 
 ```bash
 ffprobe -v error \
@@ -132,7 +134,7 @@ ffprobe -v error \
   /tmp/ip-frame-sheet-output/one_second_animation.mp4
 ```
 
-Expected for the default flow:
+默认期望：
 
 ```text
 r_frame_rate=24/1
@@ -140,20 +142,20 @@ duration=1.000000
 nb_frames=24
 ```
 
-## QA Checklist
+## 质检清单
 
-Reject or regenerate the sprite sheet if:
+如果出现以下问题，应该重新生成雪碧图：
 
-- The sheet is not a clean 4x6 grid.
-- The character identity drifts across cells.
-- The output contains text, labels, numbers, watermarks, or UI chrome.
-- The sprite sheet shows rigid whole-image movement instead of internal character motion.
-- Cells are uneven, overlapping, or not safely crop-ready.
+- 不是干净的 4x6 网格。
+- 角色身份在不同格子之间漂移。
+- 图片里出现文字、编号、标签、水印或 UI 元素。
+- 只是整张角色图平移/旋转，没有身体、头部、眼睛、火焰、手臂、尾巴等内部动作。
+- 单元格不均匀、重叠，或不适合稳定裁剪。
 
-## Notes
+## 说明
 
-`scripts/make_one_second_video.py` is included only as a local procedural preview fallback. It is not the main workflow and should not be used when Codex/GPT Image generation is available.
+`scripts/make_one_second_video.py` 只是本地程序化预览 fallback。它不是主流程；当 Codex/GPT Image 可用时，不应该用它代替图像生成。
 
-## License
+## 许可证
 
 MIT
